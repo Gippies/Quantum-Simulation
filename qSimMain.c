@@ -12,7 +12,7 @@ void randomNumberGenerator() {
 
   // load QuEST with certain number of qubits
   printf("Initializing Qubits...\n");
-  int numOfQubits = 30;
+  int numOfQubits = 10;
   QuESTEnv env = createQuESTEnv();
   Qureg qubits = createQureg(numOfQubits, env);
   initZeroState(qubits);
