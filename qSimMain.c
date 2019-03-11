@@ -33,10 +33,9 @@ void randomNumberGenerator() {
   }
   
   // Used for getting the probability before collapse
-  qreal *test = malloc(sizeof(qreal));
-  cbits[numOfQubits - 1] = measureWithStats(qubits, numOfQubits - 1, test);
-  printf("Probability of last qubit's outcome: %f\n", *test);
-  free(test);
+  qreal test;
+  cbits[numOfQubits - 1] = measureWithStats(qubits, numOfQubits - 1, &test);
+  printf("Probability of last qubit's outcome: %f\n", test);
   
   printf("Calculating Final Answer...\n");
   for (i = 0; i < numOfQubits; i++) {
@@ -55,11 +54,11 @@ void randomNumberGenerator() {
 
 void quantumTeleportation() {
 	// load QuEST with certain number of qubits
-    printf("Initializing Qubits...\n");
-    int numOfQubits = 3;
-    QuESTEnv env = createQuESTEnv();
-    Qureg qubits = createQureg(numOfQubits, env);
-    initZeroState(qubits);
+  printf("Initializing Qubits...\n");
+  int numOfQubits = 3;
+  QuESTEnv env = createQuESTEnv();
+  Qureg qubits = createQureg(numOfQubits, env);
+  initZeroState(qubits);
 	
 	int cbits[numOfQubits];
 	int i;
@@ -78,17 +77,16 @@ void quantumTeleportation() {
 	controlledNot(qubits, 1, 2);
 	controlledPhaseFlip(qubits, 0, 2);
 	
-	qreal *finalProb = malloc(sizeof(qreal));
+  qreal finalProb;
 	for (i = 0; i < numOfQubits; i++) {
-		cbits[i] = measureWithStats(qubits, i, finalProb);
-		printf("Collapsed Bit: %d, Probability: %f\n", cbits[i], *finalProb);
+		cbits[i] = measureWithStats(qubits, i, &finalProb);
+		printf("Collapsed Bit: %d, Probability: %f\n", cbits[i], finalProb);
 	}
-	free(finalProb);
 	
 	// unload QuEST
-    printf("Unloading Qubits...\n");
-    destroyQureg(qubits, env); 
-    destroyQuESTEnv(env);
+  printf("Unloading Qubits...\n");
+  destroyQureg(qubits, env); 
+  destroyQuESTEnv(env);
 }
 
 int main(int narg, char *varg[]) {
