@@ -8,24 +8,66 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+void loadQuEST(QuESTEnv *env, Qureg *qubits, int numOfQubits) {
+  printf("Initializing Qubits...\n");
+  *env = createQuESTEnv();
+  *qubits = createQureg(numOfQubits, *env);
+}
+
+void unloadQuEST(QuESTEnv *env, Qureg *qubits) {
+  printf("Unloading Qubits...\n");
+  destroyQureg(*qubits, *env); 
+  destroyQuESTEnv(*env);
+}
+
+void CTTGate(Qureg qubits, const int targetQubit) {
+  phaseShift(qubits, targetQubit, -M_PI/4);
+}
+
+void printAllAmplitudes(Qureg qubits) {
+  int numAmps = getNumAmps(qubits);
+  if (numAmps <= 1024) {
+    for (int i = 0; i < numAmps; i++) {
+      Complex amp = getAmp(qubits, i);
+      printf("Amplitude of %d real: %f imaginary: %f\n", i, amp.real, amp.imag);
+    }
+  }
+  else {
+    printf("Too many amplitudes to print, skipping...\n");
+  }
+}
+
+void printAllAmplitudesInRange(Qureg qubits, int start, int end) {
+  int numAmps = getNumAmps(qubits);
+  if (end <= numAmps) {
+    for (int i = start; i < end; i++) {
+      Complex amp = getAmp(qubits, i);
+      printf("Amplitude of %d real: %f imaginary: %f\n", i, amp.real, amp.imag);
+    }
+  }
+  else {
+    printf("End is larger than the number of amplitudes, skipping...\n");
+  }
+}
+
 void randomNumberGenerator() {
 
   // load QuEST with certain number of qubits
-  printf("Initializing Qubits...\n");
   int numOfQubits = 10;
-  QuESTEnv env = createQuESTEnv();
-  Qureg qubits = createQureg(numOfQubits, env);
-  initZeroState(qubits);
-  
+  QuESTEnv env;
+  Qureg qubits;
+  loadQuEST(&env, &qubits, numOfQubits);
   int cbits[numOfQubits];
   int i;
   int answer = 0;
 
   // apply circuit
   printf("Applying Quantum Circuit...\n");
+  initZeroState(qubits);
   for (i = 0; i < numOfQubits; i++) {
     hadamard(qubits, i);
   }
+  printAllAmplitudesInRange(qubits, 0, 4);
 
   printf("Measuring Qubits...\n");
   for (i = 0; i < numOfQubits - 1; i++) {
@@ -46,25 +88,21 @@ void randomNumberGenerator() {
   
   printf("%d\n", answer);
   
-  // unload QuEST
-  printf("Unloading Qubits...\n");
-  destroyQureg(qubits, env); 
-  destroyQuESTEnv(env);
+  unloadQuEST(&env, &qubits);
 }
 
 void quantumTeleportation() {
   // load QuEST with certain number of qubits
-  printf("Initializing Qubits...\n");
   int numOfQubits = 3;
-  QuESTEnv env = createQuESTEnv();
-  Qureg qubits = createQureg(numOfQubits, env);
-  initZeroState(qubits);
-
+  QuESTEnv env;
+  Qureg qubits;
+  loadQuEST(&env, &qubits, numOfQubits);
   int cbits[numOfQubits];
   int i;
 
   // apply circuit
   printf("Applying Quantum Circuit...\n");
+  initZeroState(qubits);
   pauliX(qubits, 0);  // Sets the first qubit to 1.
 
   // Apply Bell-State
@@ -77,19 +115,40 @@ void quantumTeleportation() {
   controlledNot(qubits, 1, 2);
   controlledPhaseFlip(qubits, 0, 2);
 
+  printf("Measuring Qubits...\n");
   qreal finalProb;
   for (i = 0; i < numOfQubits; i++) {
     cbits[i] = measureWithStats(qubits, i, &finalProb);
     printf("Collapsed Bit: %d, Probability: %f\n", cbits[i], finalProb);
   }
 
-  // unload QuEST
-  printf("Unloading Qubits...\n");
-  destroyQureg(qubits, env); 
-  destroyQuESTEnv(env);
+  unloadQuEST(&env, &qubits);
+}
+
+void qGateTest() {
+  // load QuEST with certain number of qubits
+  int numOfQubits = 1;
+  QuESTEnv env;
+  Qureg qubits;
+  loadQuEST(&env, &qubits, numOfQubits);
+  int cbit;
+  
+  // apply circuit
+  printf("Applying Quantum Circuit...\n");
+  initZeroState(qubits);
+  pauliX(qubits, 0);
+  tGate(qubits, 0);
+  printAllAmplitudes(qubits);
+  
+  printf("Measuring Qubits...\n");
+  qreal finalProb;
+  cbit = measureWithStats(qubits, 0, &finalProb);
+  printf("Collapsed Bit: %d, Probability: %f\n", cbit, finalProb);
+  
+  unloadQuEST(&env, &qubits);
 }
 
 int main(int narg, char *varg[]) {
-  quantumTeleportation();
+  randomNumberGenerator();
   return 0;
 }
