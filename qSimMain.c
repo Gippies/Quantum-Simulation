@@ -1,59 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 #include <QuEST.h>
+
+#include "JHelperMethods.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-void loadQuEST(QuESTEnv *env, Qureg *qubits, int numOfQubits) {
-  printf("Initializing Qubits...\n");
-  *env = createQuESTEnv();
-  *qubits = createQureg(numOfQubits, *env);
-}
-
-void unloadQuEST(QuESTEnv *env, Qureg *qubits) {
-  printf("Unloading Qubits...\n");
-  destroyQureg(*qubits, *env); 
-  destroyQuESTEnv(*env);
-}
-
-void CTTGate(Qureg qubits, const int targetQubit) {
-  phaseShift(qubits, targetQubit, -M_PI/4);
-}
-
-void printAllAmplitudes(Qureg qubits) {
-  int numAmps = getNumAmps(qubits);
-  if (numAmps <= 1024) {
-    for (int i = 0; i < numAmps; i++) {
-      Complex amp = getAmp(qubits, i);
-      printf("Amplitude of %d real: %f imaginary: %f\n", i, amp.real, amp.imag);
-    }
-  }
-  else {
-    printf("Too many amplitudes to print, skipping...\n");
-  }
-}
-
-void printAllAmplitudesInRange(Qureg qubits, int start, int end) {
-  int numAmps = getNumAmps(qubits);
-  if (end <= numAmps) {
-    for (int i = start; i < end; i++) {
-      Complex amp = getAmp(qubits, i);
-      printf("Amplitude of %d real: %f imaginary: %f\n", i, amp.real, amp.imag);
-    }
-  }
-  else {
-    printf("End is larger than the number of amplitudes, skipping...\n");
-  }
-}
-
 void randomNumberGenerator() {
 
   // load QuEST with certain number of qubits
-  int numOfQubits = 10;
+  int numOfQubits = 25;
   QuESTEnv env;
   Qureg qubits;
   loadQuEST(&env, &qubits, numOfQubits);
@@ -149,6 +110,20 @@ void qGateTest() {
 }
 
 int main(int narg, char *varg[]) {
+  struct timespec start, stop;
+  clock_gettime(CLOCK_REALTIME, &start);
+
+  // Insert Desired Function Here:
   randomNumberGenerator();
+
+  clock_gettime(CLOCK_REALTIME, &stop);
+  double result = (stop.tv_sec - start.tv_sec) * 1e3 + (stop.tv_nsec - start.tv_nsec) / 1e6;  // Milliseconds
+  if (result > 1000.0) {
+    result /= 1000.0;  // Convert to seconds.
+    printf("Time Elapsed: %f seconds\n", result);
+  }
+  else {
+    printf("Time Elapsed: %f milliseconds\n", result);
+  }
   return 0;
 }
