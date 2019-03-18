@@ -47,3 +47,14 @@ void printAllAmplitudesInRange(Qureg qubits, int start, int end) {
     printf("End is larger than the number of amplitudes, skipping...\n");
   }
 }
+
+void measureAllAndPrint(Qureg qubits) {
+  printf("Measuring Qubits...\n");
+  qreal finalProb;
+  int measuredValue;
+  int numQubits = getNumQubits(qubits);
+  for (int i = 0; i < numQubits; i++) {
+    measuredValue = measureWithStats(qubits, i, &finalProb);
+    printf("Qubit %d: Collapsed Value: %d, Probability: %f\n", i, measuredValue, finalProb);
+  }
+}

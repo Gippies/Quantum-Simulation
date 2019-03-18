@@ -12,8 +12,7 @@
 #endif
 
 void randomNumberGenerator() {
-
-  // load QuEST with certain number of qubits
+  printf("Running 'True' Random Number Generator Algorithm...\n");
   int numOfQubits = 25;
   QuESTEnv env;
   Qureg qubits;
@@ -53,13 +52,11 @@ void randomNumberGenerator() {
 }
 
 void quantumTeleportation() {
-  // load QuEST with certain number of qubits
+  printf("Running Quantum Teleportation Algorithm...\n");
   int numOfQubits = 3;
   QuESTEnv env;
   Qureg qubits;
   loadQuEST(&env, &qubits, numOfQubits);
-  int cbits[numOfQubits];
-  int i;
 
   // apply circuit
   printf("Applying Quantum Circuit...\n");
@@ -76,23 +73,17 @@ void quantumTeleportation() {
   controlledNot(qubits, 1, 2);
   controlledPhaseFlip(qubits, 0, 2);
 
-  printf("Measuring Qubits...\n");
-  qreal finalProb;
-  for (i = 0; i < numOfQubits; i++) {
-    cbits[i] = measureWithStats(qubits, i, &finalProb);
-    printf("Collapsed Bit: %d, Probability: %f\n", cbits[i], finalProb);
-  }
+  measureAllAndPrint(qubits);
 
   unloadQuEST(&env, &qubits);
 }
 
 void qGateTest() {
-  // load QuEST with certain number of qubits
+  printf("Running Quantum Gate Testers...\n");
   int numOfQubits = 1;
   QuESTEnv env;
   Qureg qubits;
   loadQuEST(&env, &qubits, numOfQubits);
-  int cbit;
   
   // apply circuit
   printf("Applying Quantum Circuit...\n");
@@ -101,10 +92,34 @@ void qGateTest() {
   tGate(qubits, 0);
   printAllAmplitudes(qubits);
   
-  printf("Measuring Qubits...\n");
-  qreal finalProb;
-  cbit = measureWithStats(qubits, 0, &finalProb);
-  printf("Collapsed Bit: %d, Probability: %f\n", cbit, finalProb);
+  measureAllAndPrint(qubits);
+  
+  unloadQuEST(&env, &qubits);
+}
+
+void deutschJozsa() {
+  printf("Running Deutsch-Jozsa Algorithm...\n");
+  int numOfQubits = 3;
+  QuESTEnv env;
+  Qureg qubits;
+  loadQuEST(&env, &qubits, numOfQubits);
+  
+  // apply circuit
+  printf("Applying Quantum Circuit...\n");
+  initZeroState(qubits);
+  pauliX(qubits, 2);
+  for (int i = 0; i < numOfQubits; i++)
+    hadamard(qubits, i);
+  
+  // Black Box Part Here:
+  pauliZ(qubits, 0);
+  controlledPhaseFlip(qubits, 1, 2);
+  
+  // Rest of circuit:
+  for (int i = 0; i < numOfQubits - 1; i++)
+    hadamard(qubits, i);
+  
+  measureAllAndPrint(qubits);
   
   unloadQuEST(&env, &qubits);
 }
@@ -114,7 +129,7 @@ int main(int narg, char *varg[]) {
   clock_gettime(CLOCK_REALTIME, &start);
 
   // Insert Desired Function Here:
-  randomNumberGenerator();
+  deutschJozsa();
 
   clock_gettime(CLOCK_REALTIME, &stop);
   double result = (stop.tv_sec - start.tv_sec) * 1e3 + (stop.tv_nsec - start.tv_nsec) / 1e6;  // Milliseconds
