@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 
 #include <QuEST.h>
 
@@ -16,6 +17,21 @@ void unloadQuEST(QuESTEnv *env, Qureg *qubits) {
   printf("Unloading Qubits...\n");
   destroyQureg(*qubits, *env); 
   destroyQuESTEnv(*env);
+}
+
+void initValueState(Qureg qubits, int value) {
+  // Inits Qubits to a specified value in binary.
+  initZeroState(qubits);
+  int numQubits = getNumQubits(qubits);
+  if (value > (int) pow(2, numQubits) - 1 || value <= 0) {
+    printf("ERROR ERROR, init value out of range. Keeping qubits as 0...\n");
+    return;
+  }
+  for (int i = 0; i < numQubits && value > 0; i++) {
+    if (value % 2 == 1)
+      pauliX(qubits, i);
+    value /= 2;
+  }
 }
 
 void CTTGate(Qureg qubits, const int targetQubit) {

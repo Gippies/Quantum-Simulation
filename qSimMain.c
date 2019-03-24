@@ -80,22 +80,15 @@ void quantumTeleportation() {
 
 void qGateTest() {
   printf("Running Quantum Gate Testers...\n");
-  int numOfQubits = 3;
+  int numOfQubits = 4;
   QuESTEnv env;
   Qureg qubits;
   loadQuEST(&env, &qubits, numOfQubits);
   
   // apply circuit
   printf("Applying Quantum Circuit...\n");
-  initZeroState(qubits);
-  pauliX(qubits, 1);
-  pauliX(qubits, 2);
-  printAllAmplitudes(qubits);
+  initValueState(qubits, 10);
   
-  int controlQubits[] = {1, 2};
-  multiToffoliGate(qubits, controlQubits, 2, 0);
-  
-  printAllAmplitudes(qubits);
   measureAllAndPrint(qubits);
   
   unloadQuEST(&env, &qubits);
@@ -110,8 +103,7 @@ void txtExercise4_27() {
   
   // apply circuit
   printf("Applying Quantum Circuit...\n");
-  initZeroState(qubits);
-  pauliX(qubits, 0);  // Set to |001>
+  initValueState(qubits, 1);  // Set to |001>
   printAllAmplitudes(qubits);
   
   controlledNot(qubits, 2, 0);
