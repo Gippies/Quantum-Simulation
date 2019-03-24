@@ -88,13 +88,45 @@ void qGateTest() {
   // apply circuit
   printf("Applying Quantum Circuit...\n");
   initZeroState(qubits);
-  hadamard(qubits, 2);
-  hadamard(qubits, 1);
+  pauliX(qubits, 1);
+  pauliX(qubits, 2);
   printAllAmplitudes(qubits);
   
   int controlQubits[] = {1, 2};
   multiToffoliGate(qubits, controlQubits, 2, 0);
   
+  printAllAmplitudes(qubits);
+  measureAllAndPrint(qubits);
+  
+  unloadQuEST(&env, &qubits);
+}
+
+void txtExercise4_27() {
+  printf("Running Quantum Gate Testers...\n");
+  int numOfQubits = 3;
+  QuESTEnv env;
+  Qureg qubits;
+  loadQuEST(&env, &qubits, numOfQubits);
+  
+  // apply circuit
+  printf("Applying Quantum Circuit...\n");
+  initZeroState(qubits);
+  pauliX(qubits, 0);  // Set to |001>
+  printAllAmplitudes(qubits);
+  
+  controlledNot(qubits, 2, 0);
+  controlledNot(qubits, 1, 0);
+  int controlQubits[] = {1, 2};
+  multiToffoliGate(qubits, controlQubits, 2, 0);
+  controlledNot(qubits, 0, 1);
+  controlledNot(qubits, 0, 2);
+  controlledNot(qubits, 0, 1);
+  controlQubits[0] = 0;
+  controlQubits[1] = 1;
+  multiToffoliGate(qubits, controlQubits, 2, 2);
+  controlledNot(qubits, 0, 1);
+  
+  // Should get |111>
   printAllAmplitudes(qubits);
   measureAllAndPrint(qubits);
   
@@ -135,7 +167,7 @@ int main(int narg, char *varg[]) {
   clock_gettime(CLOCK_REALTIME, &start);
 
   // Insert Desired Function Here:
-  qGateTest();
+  txtExercise4_27();
 
   clock_gettime(CLOCK_REALTIME, &stop);
   double result = (stop.tv_sec - start.tv_sec) * 1e3 + (stop.tv_nsec - start.tv_nsec) / 1e6;  // Milliseconds
