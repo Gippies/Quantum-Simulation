@@ -67,11 +67,14 @@ void printAllAmplitudesInRange(Qureg qubits, int start, int end) {
 }
 
 void measureAllAndPrint(Qureg qubits) {
+  // NOTE: As each qubit is measured, it collapses and thus, the probabilities change for all
+  // quantumly entangled qubits!! Use printAllAmplitudes before this method to determine amplitudes
+  // without collapse.
   printf("Measuring Qubits...\n");
   qreal finalProb;
   int measuredValue;
   int numQubits = getNumQubits(qubits);
-  for (int i = 0; i < numQubits; i++) {
+  for (int i = numQubits - 1; i > -1; i--) {
     measuredValue = measureWithStats(qubits, i, &finalProb);
     printf("Qubit %d: Collapsed Value: %d, Probability: %f\n", i, measuredValue, finalProb);
   }

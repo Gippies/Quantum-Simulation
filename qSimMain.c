@@ -61,17 +61,17 @@ void quantumTeleportation() {
   // apply circuit
   printf("Applying Quantum Circuit...\n");
   initZeroState(qubits);
-  pauliX(qubits, 0);  // Sets the first qubit to 1.
+  pauliX(qubits, 2);  // Sets the first qubit to 1.
 
   // Apply Bell-State
   hadamard(qubits, 1);
-  controlledNot(qubits, 1, 2);
+  controlledNot(qubits, 1, 0);
 
   // Perform Quantum Teleportation Gate
-  controlledNot(qubits, 0, 1);
-  hadamard(qubits, 0);
-  controlledNot(qubits, 1, 2);
-  controlledPhaseFlip(qubits, 0, 2);
+  controlledNot(qubits, 2, 1);
+  hadamard(qubits, 2);
+  controlledNot(qubits, 1, 0);
+  controlledPhaseFlip(qubits, 2, 0);
 
   measureAllAndPrint(qubits);
 
@@ -96,13 +96,13 @@ void qGateTest() {
   multiToffoliGate(qubits, controlQubits, 2, 0);
   
   printAllAmplitudes(qubits);
-  // measureAllAndPrint(qubits);
-  measureAndPrint(qubits, 0);
+  measureAllAndPrint(qubits);
   
   unloadQuEST(&env, &qubits);
 }
 
 void deutschJozsa() {
+  // This doesn't seem to be working properly...
   printf("Running Deutsch-Jozsa Algorithm...\n");
   int numOfQubits = 3;
   QuESTEnv env;
@@ -112,19 +112,20 @@ void deutschJozsa() {
   // apply circuit
   printf("Applying Quantum Circuit...\n");
   initZeroState(qubits);
-  pauliX(qubits, 2);
+  pauliX(qubits, 0);
   for (int i = 0; i < numOfQubits; i++)
     hadamard(qubits, i);
   
   // Black Box Part Here:
-  pauliZ(qubits, 0);
-  controlledPhaseFlip(qubits, 1, 2);
+  pauliZ(qubits, 2);
+  controlledPhaseFlip(qubits, 1, 0);
   
   // Rest of circuit:
-  for (int i = 0; i < numOfQubits - 1; i++)
+  for (int i = 1; i < numOfQubits; i++)
     hadamard(qubits, i);
   
-  measureAllAndPrint(qubits);
+  // measureAllAndPrint(qubits);
+  measureAndPrint(qubits, 0);
   
   unloadQuEST(&env, &qubits);
 }
