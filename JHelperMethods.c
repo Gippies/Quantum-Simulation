@@ -23,6 +23,7 @@ void CTTGate(Qureg qubits, const int targetQubit) {
 }
 
 void printAllAmplitudes(Qureg qubits) {
+  printf("Printing All Amplitudes...\n");
   int numAmps = getNumAmps(qubits);
   if (numAmps <= 1024) {
     for (int i = 0; i < numAmps; i++) {
@@ -36,6 +37,7 @@ void printAllAmplitudes(Qureg qubits) {
 }
 
 void printAllAmplitudesInRange(Qureg qubits, int start, int end) {
+  printf("Printing All Amplitudes From %d to %d...\n", start, end);
   int numAmps = getNumAmps(qubits);
   if (end <= numAmps) {
     for (int i = start; i < end; i++) {
