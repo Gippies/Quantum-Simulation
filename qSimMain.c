@@ -80,7 +80,7 @@ void quantumTeleportation() {
 
 void qGateTest() {
   printf("Running Quantum Gate Testers...\n");
-  int numOfQubits = 1;
+  int numOfQubits = 3;
   QuESTEnv env;
   Qureg qubits;
   loadQuEST(&env, &qubits, numOfQubits);
@@ -88,11 +88,16 @@ void qGateTest() {
   // apply circuit
   printf("Applying Quantum Circuit...\n");
   initZeroState(qubits);
-  pauliX(qubits, 0);
-  tGate(qubits, 0);
+  hadamard(qubits, 2);
+  hadamard(qubits, 1);
   printAllAmplitudes(qubits);
   
-  measureAllAndPrint(qubits);
+  int controlQubits[] = {1, 2};
+  multiToffoliGate(qubits, controlQubits, 2, 0);
+  
+  printAllAmplitudes(qubits);
+  // measureAllAndPrint(qubits);
+  measureAndPrint(qubits, 0);
   
   unloadQuEST(&env, &qubits);
 }
@@ -129,7 +134,7 @@ int main(int narg, char *varg[]) {
   clock_gettime(CLOCK_REALTIME, &start);
 
   // Insert Desired Function Here:
-  deutschJozsa();
+  qGateTest();
 
   clock_gettime(CLOCK_REALTIME, &stop);
   double result = (stop.tv_sec - start.tv_sec) * 1e3 + (stop.tv_nsec - start.tv_nsec) / 1e6;  // Milliseconds
