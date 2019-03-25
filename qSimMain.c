@@ -108,14 +108,11 @@ void txtExercise4_27() {
   
   controlledNot(qubits, 2, 0);
   controlledNot(qubits, 1, 0);
-  int controlQubits[] = {1, 2};
-  multiToffoliGate(qubits, controlQubits, 2, 0);
+  multiToffoliGate(qubits, (int []){1, 2}, 2, 0);
   controlledNot(qubits, 0, 1);
   controlledNot(qubits, 0, 2);
   controlledNot(qubits, 0, 1);
-  controlQubits[0] = 0;
-  controlQubits[1] = 1;
-  multiToffoliGate(qubits, controlQubits, 2, 2);
+  multiToffoliGate(qubits, (int []){0, 1}, 2, 2);
   controlledNot(qubits, 0, 1);
   
   // Should get |111>
