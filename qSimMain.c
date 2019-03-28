@@ -158,7 +158,7 @@ void QFT() {
   Qureg qubits;
   loadQuEST(&env, &qubits, numOfQubits);
   qreal theta = 0.0;
-  int theta_counter = 2;
+  int thetaCounter = 2;
   
   // apply circuit
   printf("Applying Quantum Circuit...\n");
@@ -168,13 +168,47 @@ void QFT() {
   for (int i = 0; i < numOfQubits; i++) {
     hadamard(qubits, i);
     // printf("i: %d\n", i);
-    theta_counter = 2;
+    thetaCounter = 2;
     for (int j = i + 1; j < numOfQubits; j++) {
-      theta = 2.0 * M_PI / pow(2.0, theta_counter);
-      theta_counter++;
+      theta = 2.0 * M_PI / pow(2.0, thetaCounter);
+      thetaCounter++;
       // printf("Theta: %f\n", theta);
       controlledPhaseShift(qubits, j, i, theta);
     }
+  }
+  
+  printAllAmplitudes(qubits);
+  measureAllAndPrint(qubits);
+  // measureAndPrint(qubits, 0);
+  
+  unloadQuEST(&env, &qubits);
+}
+
+void inverseQFT() {
+  printf("Running Inverse Quantum Fourier Transform...\n");
+  int numOfQubits = 3;
+  QuESTEnv env;
+  Qureg qubits;
+  loadQuEST(&env, &qubits, numOfQubits);
+  qreal theta = 0.0;
+  int thetaCounter = numOfQubits;
+  
+  // apply circuit
+  printf("Applying Quantum Circuit...\n");
+  initOneState(qubits);
+  
+  // This might be upside-down...
+  for (int i = numOfQubits - 1; i >= 0; i--) {
+    // printf("i: %d\n", i);
+    thetaCounter = numOfQubits - i;
+    for (int j = numOfQubits - 1; j > i; j--) {
+      // printf("    j: %d\n", j);
+      theta = 2.0 * M_PI / pow(2.0, thetaCounter);
+      // printf("    Theta Counter: %d\n", thetaCounter);
+      thetaCounter--;
+      controlledPhaseShift(qubits, j, i, theta);
+    }
+    hadamard(qubits, i);
   }
   
   printAllAmplitudes(qubits);
@@ -189,7 +223,7 @@ int main(int narg, char *varg[]) {
   clock_gettime(CLOCK_REALTIME, &start);
 
   // Insert Desired Function Here:
-  QFT();
+  inverseQFT();
 
   clock_gettime(CLOCK_REALTIME, &stop);
   double result = (stop.tv_sec - start.tv_sec) * 1e3 + (stop.tv_nsec - start.tv_nsec) / 1e6;  // Milliseconds
