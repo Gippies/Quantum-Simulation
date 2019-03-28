@@ -42,22 +42,6 @@ void initValueState(Qureg qubits, int value) {
   }
 }
 
-void initReverseValueState(Qureg qubits, int value) {
-  // Inits Qubits to a specified value in binary.
-  // This method is used if the algorithm is upside-down.
-  initZeroState(qubits);
-  int numQubits = getNumQubits(qubits);
-  if (value > (int) pow(2, numQubits) - 1 || value <= 0) {
-    printf("ERROR ERROR, init value out of range. Keeping qubits as 0...\n");
-    return;
-  }
-  for (int i = numQubits - 1; i >= 0 && value > 0; i--) {
-    if (value % 2 == 1)
-      pauliX(qubits, i);
-    value /= 2;
-  }
-}
-
 void CTTGate(Qureg qubits, const int targetQubit) {
   phaseShift(qubits, targetQubit, -M_PI/4);
 }
@@ -76,6 +60,13 @@ void multiToffoliGate(Qureg qubits, int *controlQubits, const int numControlQubi
   u.r1c1 = (Complex) {.real=0.0, .imag=0.0};
   
   multiControlledUnitary(qubits, controlQubits, numControlQubits, targetQubit, u);
+}
+
+void swapAll(Qureg qubits) {
+  int numQubits = getNumQubits(qubits);
+  for (int i = 0; i < numQubits / 2; i++) {
+    swapGate(qubits, i, (numQubits - 1) - i);
+  }
 }
 
 void printAllAmplitudes(Qureg qubits) {

@@ -80,15 +80,25 @@ void quantumTeleportation() {
 
 void qGateTest() {
   printf("Running Quantum Gate Testers...\n");
-  int numOfQubits = 4;
+  int numOfQubits = 3;
   QuESTEnv env;
   Qureg qubits;
   loadQuEST(&env, &qubits, numOfQubits);
   
   // apply circuit
   printf("Applying Quantum Circuit...\n");
-  initValueState(qubits, 10);
+  initValueState(qubits, 2);
+  qreal theta;
+  theta = 2.0 * M_PI / pow(2.0, 2);
+  phaseShift(qubits, 0, theta);
+  theta = 2.0 * M_PI / pow(2.0, 3);
+  phaseShift(qubits, 0, theta);
+  theta = 2.0 * M_PI / pow(2.0, 3);
+  phaseShift(qubits, 0, theta);
+  theta = 2.0 * M_PI / pow(2.0, 2);
+  phaseShift(qubits, 0, theta);
   
+  printAllAmplitudes(qubits);
   measureAllAndPrint(qubits);
   
   unloadQuEST(&env, &qubits);
@@ -162,24 +172,21 @@ void QFT() {
   
   // apply circuit
   printf("Applying Quantum Circuit...\n");
-  initReverseValueState(qubits, 2);
+  initValueState(qubits, 2);
   
-  // This might be upside-down...
-  for (int i = 0; i < numOfQubits; i++) {
+  for (int i = numOfQubits - 1; i >= 0; i--) {
     hadamard(qubits, i);
-    // printf("i: %d\n", i);
     thetaCounter = 2;
-    for (int j = i + 1; j < numOfQubits; j++) {
+    for (int j = i - 1; j >= 0; j--) {
       theta = 2.0 * M_PI / pow(2.0, thetaCounter);
       thetaCounter++;
-      // printf("Theta: %f\n", theta);
       controlledPhaseShift(qubits, j, i, theta);
     }
   }
+  swapAll(qubits);
   
   printAllAmplitudes(qubits);
   measureAllAndPrint(qubits);
-  // measureAndPrint(qubits, 0);
   
   unloadQuEST(&env, &qubits);
 }
@@ -195,25 +202,41 @@ void inverseQFT() {
   
   // apply circuit
   printf("Applying Quantum Circuit...\n");
-  initOneState(qubits);
+  initValueState(qubits, 2);
   
-  // This might be upside-down...
+  printAllAmplitudes(qubits);
+  
+  // Apply Regular QFT First...
   for (int i = numOfQubits - 1; i >= 0; i--) {
-    // printf("i: %d\n", i);
-    thetaCounter = numOfQubits - i;
-    for (int j = numOfQubits - 1; j > i; j--) {
-      // printf("    j: %d\n", j);
+    printf("Hadamard on i: %d\n", i);
+    hadamard(qubits, i);
+    thetaCounter = 2;
+    for (int j = i - 1; j >= 0; j--) {
       theta = 2.0 * M_PI / pow(2.0, thetaCounter);
-      // printf("    Theta Counter: %d\n", thetaCounter);
-      thetaCounter--;
+      thetaCounter++;
+      printf("Controlled Phase Shift on j: %d, i: %d, theta: %f\n", j, i, theta);
       controlledPhaseShift(qubits, j, i, theta);
     }
+  }
+  // swapAll(qubits);
+  
+  // swapAll(qubits);
+  printf("----------------Starting Inverse Part...----------------\n");
+  // Apply Inverse QFT and see if we get the initial value...
+  for (int i = 0; i < numOfQubits; i++) {
+    thetaCounter = i + 1;
+    for (int j = 0; j < i; j++) {
+      theta = 2.0 * M_PI / pow(2.0, thetaCounter);
+      thetaCounter--;
+      printf("Controlled Phase Shift on j: %d, i: %d, theta: %f\n", j, i, theta);
+      controlledPhaseShift(qubits, j, i, theta);
+    }
+    printf("Hadamard on i: %d\n", i);
     hadamard(qubits, i);
   }
   
   printAllAmplitudes(qubits);
   measureAllAndPrint(qubits);
-  // measureAndPrint(qubits, 0);
   
   unloadQuEST(&env, &qubits);
 }
@@ -223,7 +246,7 @@ int main(int narg, char *varg[]) {
   clock_gettime(CLOCK_REALTIME, &start);
 
   // Insert Desired Function Here:
-  QFT();
+  inverseQFT();
 
   clock_gettime(CLOCK_REALTIME, &stop);
   double result = (stop.tv_sec - start.tv_sec) * 1e3 + (stop.tv_nsec - start.tv_nsec) / 1e6;  // Milliseconds
