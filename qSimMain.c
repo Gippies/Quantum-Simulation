@@ -151,12 +151,45 @@ void deutschJozsa() {
   unloadQuEST(&env, &qubits);
 }
 
+void QFT() {
+  printf("Running Quantum Fourier Transform...\n");
+  int numOfQubits = 3;
+  QuESTEnv env;
+  Qureg qubits;
+  loadQuEST(&env, &qubits, numOfQubits);
+  qreal theta = 0.0;
+  int theta_counter = 2;
+  
+  // apply circuit
+  printf("Applying Quantum Circuit...\n");
+  initOneState(qubits);
+  
+  // This might be upside-down...
+  for (int i = 0; i < numOfQubits; i++) {
+    hadamard(qubits, i);
+    // printf("i: %d\n", i);
+    theta_counter = 2;
+    for (int j = i + 1; j < numOfQubits; j++) {
+      theta = 2.0 * M_PI / pow(2.0, theta_counter);
+      theta_counter++;
+      // printf("Theta: %f\n", theta);
+      controlledPhaseShift(qubits, j, i, theta);
+    }
+  }
+  
+  printAllAmplitudes(qubits);
+  measureAllAndPrint(qubits);
+  // measureAndPrint(qubits, 0);
+  
+  unloadQuEST(&env, &qubits);
+}
+
 int main(int narg, char *varg[]) {
   struct timespec start, stop;
   clock_gettime(CLOCK_REALTIME, &start);
 
   // Insert Desired Function Here:
-  txtExercise4_27();
+  QFT();
 
   clock_gettime(CLOCK_REALTIME, &stop);
   double result = (stop.tv_sec - start.tv_sec) * 1e3 + (stop.tv_nsec - start.tv_nsec) / 1e6;  // Milliseconds

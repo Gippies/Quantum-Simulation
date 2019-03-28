@@ -19,6 +19,14 @@ void unloadQuEST(QuESTEnv *env, Qureg *qubits) {
   destroyQuESTEnv(*env);
 }
 
+void initOneState(Qureg qubits) {
+  initZeroState(qubits);
+  int numQubits = getNumQubits(qubits);
+  for (int i = 0; i < numQubits; i++) {
+    pauliX(qubits, i);
+  }
+}
+
 void initValueState(Qureg qubits, int value) {
   // Inits Qubits to a specified value in binary.
   initZeroState(qubits);
