@@ -162,7 +162,7 @@ void QFT() {
   
   // apply circuit
   printf("Applying Quantum Circuit...\n");
-  initOneState(qubits);
+  initReverseValueState(qubits, 2);
   
   // This might be upside-down...
   for (int i = 0; i < numOfQubits; i++) {
@@ -223,7 +223,7 @@ int main(int narg, char *varg[]) {
   clock_gettime(CLOCK_REALTIME, &start);
 
   // Insert Desired Function Here:
-  inverseQFT();
+  QFT();
 
   clock_gettime(CLOCK_REALTIME, &stop);
   double result = (stop.tv_sec - start.tv_sec) * 1e3 + (stop.tv_nsec - start.tv_nsec) / 1e6;  // Milliseconds
