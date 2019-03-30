@@ -89,15 +89,19 @@ void qGateTest() {
   printf("Applying Quantum Circuit...\n");
   initValueState(qubits, 2);
   qreal theta;
+
+  hadamard(qubits, 0);
   theta = 2.0 * M_PI / pow(2.0, 2);
   phaseShift(qubits, 0, theta);
   theta = 2.0 * M_PI / pow(2.0, 3);
   phaseShift(qubits, 0, theta);
-  theta = 2.0 * M_PI / pow(2.0, 3);
+  theta = -(2.0 * M_PI / pow(2.0, 3));
   phaseShift(qubits, 0, theta);
-  theta = 2.0 * M_PI / pow(2.0, 2);
+  theta = -(2.0 * M_PI / pow(2.0, 2));
   phaseShift(qubits, 0, theta);
-  
+  hadamard(qubits, 0);
+  swapAll(qubits);
+
   printAllAmplitudes(qubits);
   measureAllAndPrint(qubits);
   
@@ -203,35 +207,26 @@ void inverseQFT() {
   // apply circuit
   printf("Applying Quantum Circuit...\n");
   initValueState(qubits, 2);
-  
-  printAllAmplitudes(qubits);
-  
+    
   // Apply Regular QFT First...
   for (int i = numOfQubits - 1; i >= 0; i--) {
-    printf("Hadamard on i: %d\n", i);
     hadamard(qubits, i);
     thetaCounter = 2;
     for (int j = i - 1; j >= 0; j--) {
       theta = 2.0 * M_PI / pow(2.0, thetaCounter);
       thetaCounter++;
-      printf("Controlled Phase Shift on j: %d, i: %d, theta: %f\n", j, i, theta);
       controlledPhaseShift(qubits, j, i, theta);
     }
   }
-  // swapAll(qubits);
-  
-  // swapAll(qubits);
-  printf("----------------Starting Inverse Part...----------------\n");
+
   // Apply Inverse QFT and see if we get the initial value...
   for (int i = 0; i < numOfQubits; i++) {
     thetaCounter = i + 1;
     for (int j = 0; j < i; j++) {
-      theta = 2.0 * M_PI / pow(2.0, thetaCounter);
+      theta = -(2.0 * M_PI / pow(2.0, thetaCounter));
       thetaCounter--;
-      printf("Controlled Phase Shift on j: %d, i: %d, theta: %f\n", j, i, theta);
       controlledPhaseShift(qubits, j, i, theta);
     }
-    printf("Hadamard on i: %d\n", i);
     hadamard(qubits, i);
   }
   

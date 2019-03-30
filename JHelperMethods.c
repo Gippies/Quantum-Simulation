@@ -8,7 +8,7 @@
 #endif
 
 void loadQuEST(QuESTEnv *env, Qureg *qubits, int numOfQubits) {
-  printf("Initializing Qubits...\n");
+  printf("Initializing %d Qubits...\n", numOfQubits);
   *env = createQuESTEnv();
   *qubits = createQureg(numOfQubits, *env);
 }
@@ -35,6 +35,7 @@ void initValueState(Qureg qubits, int value) {
     printf("ERROR ERROR, init value out of range. Keeping qubits as 0...\n");
     return;
   }
+  printf("Setting Qubits Value to %d...\n", value);
   for (int i = 0; i < numQubits && value > 0; i++) {
     if (value % 2 == 1)
       pauliX(qubits, i);
