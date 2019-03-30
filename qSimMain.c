@@ -80,29 +80,16 @@ void quantumTeleportation() {
 
 void qGateTest() {
   printf("Running Quantum Gate Testers...\n");
-  int numOfQubits = 3;
+  int numOfQubits = 6;
   QuESTEnv env;
   Qureg qubits;
   loadQuEST(&env, &qubits, numOfQubits);
   
   // apply circuit
   printf("Applying Quantum Circuit...\n");
-  initValueState(qubits, 2);
-  qreal theta;
-
-  hadamard(qubits, 0);
-  theta = 2.0 * M_PI / pow(2.0, 2);
-  phaseShift(qubits, 0, theta);
-  theta = 2.0 * M_PI / pow(2.0, 3);
-  phaseShift(qubits, 0, theta);
-  theta = -(2.0 * M_PI / pow(2.0, 3));
-  phaseShift(qubits, 0, theta);
-  theta = -(2.0 * M_PI / pow(2.0, 2));
-  phaseShift(qubits, 0, theta);
-  hadamard(qubits, 0);
+  initValueState(qubits, 7);
   swapAll(qubits);
 
-  printAllAmplitudes(qubits);
   measureAllAndPrint(qubits);
   
   unloadQuEST(&env, &qubits);

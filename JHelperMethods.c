@@ -41,6 +41,7 @@ void initValueState(Qureg qubits, int value) {
       pauliX(qubits, i);
     value /= 2;
   }
+  printf("Resuming Circuit...\n");
 }
 
 void CTTGate(Qureg qubits, const int targetQubit) {
@@ -106,7 +107,7 @@ void measureAllAndPrint(Qureg qubits) {
   qreal finalProb;
   int measuredValue;
   int numQubits = getNumQubits(qubits);
-  for (int i = numQubits - 1; i > -1; i--) {
+  for (int i = numQubits - 1; i >= 0; i--) {
     measuredValue = measureWithStats(qubits, i, &finalProb);
     printf("Qubit %d: Collapsed Value: %d, Probability: %f\n", i, measuredValue, finalProb);
   }
