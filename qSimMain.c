@@ -61,7 +61,7 @@ void quantumTeleportation() {
   // apply circuit
   printf("Applying Quantum Circuit...\n");
   initZeroState(qubits);
-  pauliX(qubits, 2);  // Sets the first qubit to 1.
+  pauliX(qubits, 2);  // Sets the last qubit to 1.
 
   // Apply Bell-State
   hadamard(qubits, 1);
@@ -96,7 +96,7 @@ void qGateTest() {
 }
 
 void txtExercise4_27() {
-  printf("Running Quantum Gate Testers...\n");
+  printf("Running Custom Partial Cycle Permutation ...\n");
   int numOfQubits = 3;
   QuESTEnv env;
   Qureg qubits;
@@ -205,7 +205,11 @@ void inverseQFT() {
       controlledPhaseShift(qubits, j, i, theta);
     }
   }
-
+  swapAll(qubits);
+  
+  printAllAmplitudes(qubits);
+  
+  swapAll(qubits);
   // Apply Inverse QFT and see if we get the initial value...
   for (int i = 0; i < numOfQubits; i++) {
     thetaCounter = i + 1;
