@@ -64,6 +64,20 @@ void multiToffoliGate(Qureg qubits, int *controlQubits, const int numControlQubi
   multiControlledUnitary(qubits, controlQubits, numControlQubits, targetQubit, u);
 }
 
+void inverseQFTCircuit(Qureg qubits, int start, int end) {
+  qreal theta;
+  int thetaCounter;
+  for (int i = start; i < end; i++) {
+    thetaCounter = i + 1;
+    for (int j = 0; j < i; j++) {
+      theta = -(2.0 * M_PI / pow(2.0, thetaCounter));
+      thetaCounter--;
+      controlledPhaseShift(qubits, j, i, theta);
+    }
+    hadamard(qubits, i);
+  }
+}
+
 void swapAll(Qureg qubits) {
   int numQubits = getNumQubits(qubits);
   for (int i = 0; i < numQubits / 2; i++) {

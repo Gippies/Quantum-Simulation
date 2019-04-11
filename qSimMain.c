@@ -88,7 +88,8 @@ void qGateTest() {
   // apply circuit
   printf("Applying Quantum Circuit...\n");
   initValueState(qubits, 7);
-  swapAll(qubits);
+  
+  inverseQFTCircuit(qubits, 0, numOfQubits);
 
   measureAllAndPrint(qubits);
   

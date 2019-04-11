@@ -6,6 +6,7 @@ void initValueState(Qureg qubits, int value);
 void CTTGate(Qureg qubits, const int targetQubit);
 void swapGate(Qureg qubits, const int qubit1, const int qubit2);
 void multiToffoliGate(Qureg qubits, int *controlQubits, const int numControlQubits, const int targetQubit);
+void inverseQFTCircuit(Qureg qubits, int start, int end);
 void swapAll(Qureg qubits);
 void printAllAmplitudes(Qureg qubits);
 void printAllAmplitudesInRange(Qureg qubits, int start, int end);
