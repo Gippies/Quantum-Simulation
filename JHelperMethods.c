@@ -30,18 +30,20 @@ void initOneState(Qureg qubits) {
 void initValueState(Qureg qubits, int value) {
   // Inits Qubits to a specified value in binary.
   initZeroState(qubits);
-  int numQubits = getNumQubits(qubits);
-  if (value > (int) pow(2, numQubits) - 1 || value <= 0) {
-    printf("ERROR ERROR, init value out of range. Keeping qubits as 0...\n");
-    return;
+  if (value != 0) {
+    int numQubits = getNumQubits(qubits);
+    if (value > (int) pow(2, numQubits) - 1 || value < 0) {
+      printf("ERROR ERROR, init value out of range. Keeping qubits as 0...\n");
+      return;
+    }
+    printf("Setting Qubits Value to %d...\n", value);
+    for (int i = 0; i < numQubits && value > 0; i++) {
+      if (value % 2 == 1)
+        pauliX(qubits, i);
+      value /= 2;
+    }
+    printf("Resuming Circuit...\n");
   }
-  printf("Setting Qubits Value to %d...\n", value);
-  for (int i = 0; i < numQubits && value > 0; i++) {
-    if (value % 2 == 1)
-      pauliX(qubits, i);
-    value /= 2;
-  }
-  printf("Resuming Circuit...\n");
 }
 
 void CTTGate(Qureg qubits, const int targetQubit) {
@@ -54,6 +56,20 @@ void swapGate(Qureg qubits, const int qubit1, const int qubit2) {
   controlledNot(qubits, qubit1, qubit2);
 }
 
+void swapAll(Qureg qubits) {
+  int numQubits = getNumQubits(qubits);
+  for (int i = 0; i < numQubits / 2; i++) {
+    swapGate(qubits, i, (numQubits - 1) - i);
+  }
+}
+
+void swapAllInRange(Qureg qubits, int start, int end) {
+  int lastSwap = (start + end) / 2;
+  for (int i = start; i < lastSwap; i++) {
+    swapGate(qubits, i, (end - 1) - i);
+  }
+}
+
 void multiToffoliGate(Qureg qubits, int *controlQubits, const int numControlQubits, const int targetQubit) {
   ComplexMatrix2 u;
   u.r0c0 = (Complex) {.real=0.0, .imag=0.0};
@@ -64,24 +80,33 @@ void multiToffoliGate(Qureg qubits, int *controlQubits, const int numControlQubi
   multiControlledUnitary(qubits, controlQubits, numControlQubits, targetQubit, u);
 }
 
+void QFTCircuit(Qureg qubits, int start, int end) {
+  qreal theta;
+  int thetaCounter;
+  for (int i = end - 1; i >= start; i--) {
+    hadamard(qubits, i);
+    thetaCounter = 2;
+    for (int j = i - 1; j >= start; j--) {
+      theta = 2.0 * M_PI / pow(2.0, thetaCounter);
+      thetaCounter++;
+      controlledPhaseShift(qubits, j, i, theta);
+    }
+  }
+  swapAllInRange(qubits, start, end);
+}
+
 void inverseQFTCircuit(Qureg qubits, int start, int end) {
+  swapAllInRange(qubits, start, end);
   qreal theta;
   int thetaCounter;
   for (int i = start; i < end; i++) {
     thetaCounter = i + 1;
-    for (int j = 0; j < i; j++) {
+    for (int j = start; j < i; j++) {
       theta = -(2.0 * M_PI / pow(2.0, thetaCounter));
       thetaCounter--;
       controlledPhaseShift(qubits, j, i, theta);
     }
     hadamard(qubits, i);
-  }
-}
-
-void swapAll(Qureg qubits) {
-  int numQubits = getNumQubits(qubits);
-  for (int i = 0; i < numQubits / 2; i++) {
-    swapGate(qubits, i, (numQubits - 1) - i);
   }
 }
 
@@ -122,6 +147,16 @@ void measureAllAndPrint(Qureg qubits) {
   int measuredValue;
   int numQubits = getNumQubits(qubits);
   for (int i = numQubits - 1; i >= 0; i--) {
+    measuredValue = measureWithStats(qubits, i, &finalProb);
+    printf("Qubit %d: Collapsed Value: %d, Probability: %f\n", i, measuredValue, finalProb);
+  }
+}
+
+void measureAndPrintInRange(Qureg qubits, int start, int end) {
+  printf("Measuring Qubits...\n");
+  qreal finalProb;
+  int measuredValue;
+  for (int i = end - 1; i >= start; i--) {
     measuredValue = measureWithStats(qubits, i, &finalProb);
     printf("Qubit %d: Collapsed Value: %d, Probability: %f\n", i, measuredValue, finalProb);
   }

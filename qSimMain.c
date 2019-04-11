@@ -228,12 +228,45 @@ void inverseQFT() {
   unloadQuEST(&env, &qubits);
 }
 
+void phaseEstimation() {
+  printf("Running Phase Estimation...\n");
+  int numOfQubits = 8;
+  int endOfBottomReg = 4;  // This doesn't depend on numOfQubits, but the top register does depend on being able to accurately hold the phase shift that's being estimated, so the top should be big enough to store whatever phi is.
+  qreal phi = 2.0;  // This is what we're trying to estimate, it should be able to fit in the top register.
+  qreal theta;
+  QuESTEnv env;
+  Qureg qubits;
+  loadQuEST(&env, &qubits, numOfQubits);
+  
+  // apply circuit
+  printf("Applying Quantum Circuit...\n");
+  initValueState(qubits, 2);
+  
+  QFTCircuit(qubits, 0, endOfBottomReg);
+  
+  for (int i = endOfBottomReg; i < numOfQubits; i++)
+    hadamard(qubits, i);
+  
+  // controlled-U operation...
+  for (int i = endOfBottomReg; i < numOfQubits; i++) {
+    theta = 2.0 * M_PI * pow(2, i - endOfBottomReg) * phi;
+    for (int j = 0; j < endOfBottomReg; j++) {
+      controlledPhaseShift(qubits, i, j, theta);
+    }
+  }
+  
+  inverseQFTCircuit(qubits, endOfBottomReg, numOfQubits);
+
+  measureAndPrintInRange(qubits, endOfBottomReg, numOfQubits);
+  unloadQuEST(&env, &qubits);
+}
+
 int main(int narg, char *varg[]) {
   struct timespec start, stop;
   clock_gettime(CLOCK_REALTIME, &start);
 
   // Insert Desired Function Here:
-  inverseQFT();
+  phaseEstimation();
 
   clock_gettime(CLOCK_REALTIME, &stop);
   double result = (stop.tv_sec - start.tv_sec) * 1e3 + (stop.tv_nsec - start.tv_nsec) / 1e6;  // Milliseconds
