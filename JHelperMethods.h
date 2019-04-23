@@ -14,4 +14,5 @@ void printAllAmplitudes(Qureg qubits);
 void printAllAmplitudesInRange(Qureg qubits, int start, int end);
 void measureAllAndPrint(Qureg qubits);
 void measureAndPrintInRange(Qureg qubits, int start, int end);
+int measureAndPrintInRangeWithReturn(Qureg qubits, int start, int end);
 void measureAndPrint(Qureg qubits, int measureQubit);

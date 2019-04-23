@@ -261,12 +261,53 @@ void phaseEstimation() {
   unloadQuEST(&env, &qubits);
 }
 
+void orderFinding() {
+  printf("Running Order Finding Algorithm...\n");
+  int numOfQubits = 8;
+  int endOfBottomReg = 4;
+  qreal theta;
+  qreal phi = 2.0;
+  qreal r = 6.0;  // The value we're trying to find.
+  QuESTEnv env;
+  Qureg qubits;
+  loadQuEST(&env, &qubits, numOfQubits);
+  
+  // apply circuit
+  printf("Applying Quantum Circuit...\n");
+  initZeroState(qubits);
+  for (int i = 0; i < endOfBottomReg; i++)
+    pauliX(qubits, i);
+  
+  for (int i = endOfBottomReg; i < numOfQubits; i++)
+    hadamard(qubits, i);
+  
+  // controlled-U operation... (this would change depending on what x^j mod N is)
+  // Assume x = 5, N = 9, j is superposition of top register. Then final r should be 6.
+  for (int i = endOfBottomReg; i < numOfQubits; i++) {
+    // You would need a 3rd quantum register to find x^j mod N, this below is a shortcut
+    // that uses r (even though that's what we're trying to find) to demonstrate the similarity to the phase estimation
+    // algorithm. It's also probably wrong btw.
+    theta = 2.0 * M_PI * pow(2, i - endOfBottomReg) * phi / r;
+    for (int j = 0; j < endOfBottomReg; j++) {
+      controlledPhaseShift(qubits, i, j, theta);
+    }
+  }
+  
+  inverseQFTCircuit(qubits, endOfBottomReg, numOfQubits);
+  
+  // printAllAmplitudes(qubits);
+  int answer = measureAndPrintInRangeWithReturn(qubits, endOfBottomReg, numOfQubits);
+  answer /= phi;
+  printf("Calculated Value of r: %d\n", answer);
+  unloadQuEST(&env, &qubits);
+}
+
 int main(int narg, char *varg[]) {
   struct timespec start, stop;
   clock_gettime(CLOCK_REALTIME, &start);
 
   // Insert Desired Function Here:
-  phaseEstimation();
+  orderFinding();
 
   clock_gettime(CLOCK_REALTIME, &stop);
   double result = (stop.tv_sec - start.tv_sec) * 1e3 + (stop.tv_nsec - start.tv_nsec) / 1e6;  // Milliseconds

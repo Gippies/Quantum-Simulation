@@ -162,6 +162,20 @@ void measureAndPrintInRange(Qureg qubits, int start, int end) {
   }
 }
 
+int measureAndPrintInRangeWithReturn(Qureg qubits, int start, int end) {
+  printf("Measuring Qubits...\n");
+  qreal finalProb;
+  int measuredValue, finalValue = 0;
+  for (int i = end - 1; i >= start; i--) {
+    measuredValue = measureWithStats(qubits, i, &finalProb);
+    printf("Qubit %d: Collapsed Value: %d, Probability: %f\n", i, measuredValue, finalProb);
+    if (measuredValue == 1)
+      finalValue += pow(2, i - start);
+  }
+  printf("Final Value From Qubits: %d\n", finalValue);
+  return finalValue;
+}
+
 void measureAndPrint(Qureg qubits, int measureQubit) {
   printf("Measuring Qubit %d...\n", measureQubit);
   qreal probability;
