@@ -302,12 +302,54 @@ void orderFinding() {
   unloadQuEST(&env, &qubits);
 }
 
+void grover() {
+  printf("Running Grover's Algorithm...\n");
+  int numOfQubits = 2;
+  QuESTEnv env;
+  Qureg qubits;
+  loadQuEST(&env, &qubits, numOfQubits);
+  
+  // apply circuit
+  printf("Applying Quantum Circuit...\n");
+  initZeroState(qubits);
+  
+  for (int i = 0; i < numOfQubits; i++) {
+    hadamard(qubits, i);
+  }
+    
+  // This is the Oracle:
+  controlledPhaseFlip(qubits, 1, 0);  // It should result in 3 (or 11 in binary).
+  // printAllAmplitudes(qubits);
+  
+  // This is the Diffusion Operation:
+  for (int i = 0; i < numOfQubits; i++) {
+    hadamard(qubits, i);
+  }
+  controlledPhaseFlip(qubits, 1, 0);
+  
+  pauliX(qubits, 1);
+  controlledPhaseFlip(qubits, 1, 0);
+  pauliX(qubits, 1);
+  
+  pauliX(qubits, 0);
+  controlledPhaseFlip(qubits, 0, 1);
+  pauliX(qubits, 0);
+  
+  for (int i = 0; i < numOfQubits; i++) {
+    hadamard(qubits, i);
+  }
+  
+  printAllAmplitudes(qubits);
+  measureAllAndPrint(qubits);
+  unloadQuEST(&env, &qubits);
+}
+
 int main(int narg, char *varg[]) {
   struct timespec start, stop;
   clock_gettime(CLOCK_REALTIME, &start);
 
   // Insert Desired Function Here:
-  orderFinding();
+  grover();
 
   clock_gettime(CLOCK_REALTIME, &stop);
   double result = (stop.tv_sec - start.tv_sec) * 1e3 + (stop.tv_nsec - start.tv_nsec) / 1e6;  // Milliseconds
