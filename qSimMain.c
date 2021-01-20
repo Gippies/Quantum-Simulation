@@ -352,7 +352,7 @@ int main(int narg, char *varg[]) {
   grover();
 
   clock_gettime(CLOCK_REALTIME, &stop);
-  double result = (stop.tv_sec - start.tv_sec) * 1e3 + (stop.tv_nsec - start.tv_nsec) / 1e6;  // Milliseconds
+  double result = (double) (stop.tv_sec - start.tv_sec) * 1e3 + (double) (stop.tv_nsec - start.tv_nsec) / 1e6;  // Milliseconds
   if (result > 1000.0) {
     result /= 1000.0;  // Convert to seconds.
     printf("Time Elapsed: %f seconds\n", result);
