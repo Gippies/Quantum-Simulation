@@ -24,7 +24,7 @@ QUEST_DIR = QuEST
 COMPILER = gcc
 
 # type of above compiler, one of {GNU, INTEL, CLANG}, used for setting compiler flags
-COMPILER_TYPE = GNU
+COMPILER_TYPE = CLANG
 
 # hardwares to target: 1 means use, 0 means don't use
 MULTITHREADED = 1
